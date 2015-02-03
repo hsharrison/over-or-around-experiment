@@ -1,12 +1,10 @@
 design:
   - name: participant
+    n: 3
 
   - name: trial
     ivs:
-      height: [2, 4, 6, 8, 10, 12,
-               14, 16, 18, 20, 22, 24,
-               26, 28, 30, 32, 34, 36,
-               38, 40]
-      width: [2, 4, 6, 8, 10, 12]
+      height: [12, 16, 20, 24, 28, 32]
+      width: [4.5, 6, 7.5, 9, 10.5, 12]
 
 filename: pilot.exp
