@@ -1,0 +1,9 @@
+design:
+  - name: participant
+
+  - name: trial
+    ivs:
+      height: [2, 40]
+      width: [2, 12]
+
+filename: pilot.exp
