@@ -18,10 +18,9 @@ RESULTS_BY_CODE = {
     'u': 'unsuccessful',
 }
 MEASUREMENTS = [
-    'max_afforded_obstacle_height',
     'knee_height',
     'hip_height',
-    'full_height',
+    'lowest_height_not_afforded',
 ]
 UNITS_BY_FIELD = defaultdict(str)
 UNITS_BY_FIELD['height'] = 'in'
@@ -54,6 +53,7 @@ def show_trial(data):
 
 
 def run_trial(experiment, trial):
+    trial.data['height'] += trial.data['lowest_height_not_afforded']
     show_trial(trial.data)
     results = {'time': datetime.now()}
     for phase in ('outbound', 'return'):
@@ -68,12 +68,12 @@ def run_trial(experiment, trial):
 @contextmanager
 def setup_participant(experiment, participant):
     participant.data['terminal'] = Terminal()
-    yield
     for measurement in MEASUREMENTS:
         participant.data[measurement] = Decimal(get_input(
             '{}? '.format(measurement.replace('_', ' ')),
             castable_to(Decimal)
         ))
+    yield
     participant.data['age'] = int(get_input('age? ', castable_to(int)))
     del participant.data['terminal']
 
