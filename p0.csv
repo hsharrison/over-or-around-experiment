@@ -1,5 +1,5 @@
 participant,trial,age,full_height,height,hip_height,knee_height,max_afforded_obstacle_height,outbound,return,time,width
-1,1,30.0,0,32,0,0,28,over,around,2015-02-04 14:23:12.351863,9.0
+1,1,30.0,0,32,0,0,28,around,around,2015-02-04 14:23:12.351863,9.0
 1,2,30.0,0,16,0,0,28,over,over,2015-02-04 14:28:52.522831,4.5
 1,3,30.0,0,28,0,0,28,around,around,2015-02-04 14:29:27.913085,7.5
 1,4,30.0,0,24,0,0,28,over,over,2015-02-04 14:30:12.957067,10.5
