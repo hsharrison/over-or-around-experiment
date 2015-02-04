@@ -1,6 +1,6 @@
 design:
   - name: participant
-    n: 10
+    n: 12
 
   - name: trial
     n: 2
@@ -9,9 +9,9 @@ design:
       - [height, !!null ]
       - [width, !!null ]
     design_matrix:
-      - [  0,  6  ]
-      - [  0,  9  ]
-      - [  0, 12  ]
+      - [  2,  6  ]
+      - [  2,  9  ]
+      - [  2, 12  ]
       - [ -2,  4.5]
       - [ -2,  6  ]
       - [ -2,  7.5]
@@ -35,6 +35,7 @@ design:
       - [-14,  7.5]
       - [-14,  9  ]
       - [-14, 10.5]
+      - [-14, 12  ]
 
 filename: e1.exp
 
