@@ -15,6 +15,7 @@ contains = curry(contains)
 RESULTS_BY_CODE = {
     'o': 'over',
     'a': 'around',
+    'u': 'unsuccessful',
 }
 MEASUREMENTS = [
     'max_afforded_obstacle_height',
@@ -29,6 +30,7 @@ UNITS_BY_FIELD['width'] = 'ft'
 
 def trial_prompt(**kwargs):
     return '{phase:{}}: \
+{terminal.underline}u{terminal.normal}nsuccessful, \
 {terminal.underline}o{terminal.normal}ver or \
 {terminal.underline}a{terminal.normal}round? '.format(len('outbound'), **kwargs)
 
