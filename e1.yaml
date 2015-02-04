@@ -1,0 +1,12 @@
+design:
+  - name: participant
+    n: 10
+
+  - name: trial
+    ivs:
+      height: [12, 16, 20, 24, 28, 32]
+      width: [4.5, 6, 7.5, 9, 10.5, 12]
+
+filename: e1.exp
+
+goal_distance: 5
