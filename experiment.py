@@ -43,7 +43,7 @@ def get_input(prompt, is_allowed):
 
 
 def show_trial(data):
-    fields = ('trial', 'height', 'width')
+    fields = ('trial', 'width', 'height')
     info = Series({field: data[field] for field in fields})
 
     # To force the lines to print in a certain order.
