@@ -83,6 +83,11 @@ def setup_participant(experiment, participant):
             castable_to(Decimal)
         ))
     yield
+    gender_prompt = """\
+gender? ({t.underline}m{t.normal}ale, {t.underline}f{t.normal}emale, {t.underline}o{t.normal}ther) """.format(
+        t=Terminal()
+    )
+    participant.data['gender'] = get_input(gender_prompt, contains({'m', 'f', 'o', 'M', 'F', 'O'})).lower()
     participant.data['age'] = int(get_input('age? ', castable_to(int)))
 
 
