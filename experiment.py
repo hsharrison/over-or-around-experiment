@@ -58,7 +58,7 @@ def show_trial(data):
 
     # To force the lines to print in a certain order.
     lines = str(info).split('\n')
-    lines_by_field = {line.split()[0]: line.rstrip('.0') for line in lines}
+    lines_by_field = {line.split()[0]: line for line in lines}
     for field in fields:
         big_print(lines_by_field[field], UNITS_BY_FIELD[field])
 
