@@ -36,11 +36,11 @@ def horizontal_rule():
     big_print(17 * '=')
 
 
-def trial_prompt(**kwargs):
-    return '{phase:{}}: \
+def trial_prompt(phase):
+    return '{0:{1}}: \
 {terminal.underline}u{terminal.normal}nsuccessful, \
 {terminal.underline}o{terminal.normal}ver or \
-{terminal.underline}a{terminal.normal}round? '.format(len('outbound'), **kwargs)
+{terminal.underline}a{terminal.normal}round? '.format(phase, len('outbound'), terminal=Terminal())
 
 
 def get_input(prompt, is_allowed):
@@ -69,7 +69,7 @@ def run_trial(experiment, trial):
     results = {'time': datetime.now()}
     for phase in ('outbound', 'return'):
         results[phase] = RESULTS_BY_CODE[get_input(
-            trial_prompt(phase=phase, terminal=trial.data['terminal']),
+            trial_prompt(phase),
             contains(set(RESULTS_BY_CODE.keys()))
         )]
     return results
@@ -77,7 +77,6 @@ def run_trial(experiment, trial):
 
 @contextmanager
 def setup_participant(experiment, participant):
-    participant.data['terminal'] = Terminal()
     for measurement in MEASUREMENTS:
         participant.data[measurement] = Decimal(get_input(
             '{}? '.format(measurement.replace('_', ' ')),
@@ -85,7 +84,6 @@ def setup_participant(experiment, participant):
         ))
     yield
     participant.data['age'] = int(get_input('age? ', castable_to(int)))
-    del participant.data['terminal']
 
 
 @curry
