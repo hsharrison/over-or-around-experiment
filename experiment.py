@@ -32,6 +32,10 @@ def big_print(*args):
     call(['toilet', '-w', '120', ' '.join(args)])
 
 
+def horizontal_rule():
+    big_print(17 * '=')
+
+
 def trial_prompt(**kwargs):
     return '{phase:{}}: \
 {terminal.underline}u{terminal.normal}nsuccessful, \
@@ -47,6 +51,8 @@ def get_input(prompt, is_allowed):
 
 
 def show_trial(data):
+    horizontal_rule()
+
     fields = ('trial', 'width', 'height')
     info = Series({field: data[field] for field in fields})
 
@@ -66,7 +72,6 @@ def run_trial(experiment, trial):
             trial_prompt(phase=phase, terminal=trial.data['terminal']),
             contains(set(RESULTS_BY_CODE.keys()))
         )]
-    print()
     return results
 
 
