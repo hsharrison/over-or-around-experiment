@@ -96,7 +96,7 @@ def main():
     experiment = Experiment.from_yaml_file(sys.argv[1])
     experiment.set_context_manager('participant', setup_participant)
     experiment.set_run_callback(run_trial)
-    experiment.save(sys.argv[2])
+    experiment.save()
     return 0
 
 
