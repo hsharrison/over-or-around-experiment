@@ -1,6 +1,7 @@
 """plots.py
 
 Usage:
+  plots.py export-data <exp-file> <csv-file>
   plots.py export-proportions <exp-file> <csv-file>
 
 """
@@ -65,7 +66,12 @@ def main():
     args = docopt(__doc__)
 
     if args['export-proportions']:
-        proportion(load_data(args['<exp-file>']), ['relative_height', 'width']).reset_index().to_csv(args['<csv-file>'], index=False)
+        proportion(
+            load_data(args['<exp-file>']), ['relative_height', 'width']
+        ).reset_index().to_csv(args['<csv-file>'], index=False)
+
+    elif args['export-data']:
+        load_data(args['<exp-file>']).to_csv(args['<csv-file>'], index=True)
 
 
 if __name__ == '__main__':
