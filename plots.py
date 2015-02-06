@@ -1,7 +1,7 @@
 """plots.py
 
 Usage:
-  plots.py
+  plots.py export-proportions <exp-file> <csv-file>
 
 """
 import sys
@@ -63,6 +63,9 @@ def load_data(filename, stack=True, collapse_unsuccesful=True):
 
 def main():
     args = docopt(__doc__)
+
+    if args['export-proportions']:
+        proportion(load_data(args['<exp-file>']), ['relative_height', 'width']).reset_index().to_csv(args['<csv-file>'], index=False)
 
 
 if __name__ == '__main__':
