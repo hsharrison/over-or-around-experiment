@@ -1,8 +1,8 @@
 """plots.py
 
 Usage:
-  plots.py export-data <exp-file> <csv-file>
-  plots.py export-proportions <exp-file> <csv-file>
+  plots.py export-data <exp-file> <csv-file> [--drop-outbound <drop-participants>]
+  plots.py export-proportions <exp-file> <csv-file> [--drop-outbound <drop-participants>]
 
 """
 import sys
@@ -36,7 +36,10 @@ def plot_proportions(df, by='relative_height'):
     plt.ylabel('P(around)')
 
 
-def load_data(filename, stack=True, collapse_unsuccesful=True):
+def load_data(filename, stack=True, collapse_unsuccesful=True, drop_outbound=None):
+    if drop_outbound is None:
+        drop_outbound = []
+
     df = Experiment.load(filename).dataframe.dropna()
     for column, type_ in [
         ('height', 'int'),
@@ -45,6 +48,8 @@ def load_data(filename, stack=True, collapse_unsuccesful=True):
         ('lowest_height_not_afforded', 'int'),
     ]:
         df[column] = df[column].astype(type_)
+
+    df.loc[df.index.get_level_values('participant').isin(drop_outbound), 'outbound'] = None
 
     df['relative_height'] = df['height'] - df['lowest_height_not_afforded']
     df['scaled_height'] = df['height'] / df['lowest_height_not_afforded']
@@ -59,19 +64,25 @@ def load_data(filename, stack=True, collapse_unsuccesful=True):
         df['action'] = [row[phase] for (p, t, phase), row in df.iterrows()]
         for phase in _phases:
             del df[phase]
+        df = df.dropna()
 
     return df
 
 def main():
     args = docopt(__doc__)
 
+    if args['<drop-participants>']:
+        drop = [int(p) for p in args['<drop-participants>'].split(',')]
+    else:
+        drop = []
+
+    df = load_data(args['<exp-file>'], drop_outbound=drop)
+
     if args['export-proportions']:
-        proportion(
-            load_data(args['<exp-file>']), ['relative_height', 'width']
-        ).reset_index().to_csv(args['<csv-file>'], index=False)
+        proportion(df, ['relative_height', 'width']).reset_index().to_csv(args['<csv-file>'], index=False)
 
     elif args['export-data']:
-        load_data(args['<exp-file>']).to_csv(args['<csv-file>'], index=True)
+        df.to_csv(args['<csv-file>'], index=True)
 
 
 if __name__ == '__main__':
