@@ -22,7 +22,7 @@ e$rel_height <- e$relative_height
 
 ggplot(e, aes(y=as.numeric(action)-1, x=rel_height, color=width, group=width)) +
   geom_point(position=position_jitter(h=0.07, w=1.15)) +
-  stat_smooth(method='glm', family='binomial', se=FALSE, size=2) +
+  stat_smooth(method='glm', family=binomial(link='logit'), se=FALSE, size=2, fullrange=TRUE) +
   scale_y_continuous(breaks=c(0, 1), labels=c('over', 'around')) +
   scale_color_gradient(low='light green', high='black', name='width (ft.)') +
   theme_pander() +
@@ -33,7 +33,7 @@ ggsave('every_trial.pdf')
 
 ggplot(e, aes(y=as.numeric(action)-1, x=scaled_height, color=width, group=width)) +
   geom_point(position=position_jitter(h=0.07, w=0.2)) +
-  stat_smooth(method='glm', family='binomial', se=FALSE, size=2) +
+  stat_smooth(method='glm', family=binomial(link='logit'), se=FALSE, size=2, fullrange=TRUE) +
   scale_y_continuous(breaks=c(0, 1), labels=c('over', 'around')) +
   scale_color_gradient(low='light green', high='black', name='width (ft.)') +
   theme_pander() +
