@@ -13,7 +13,7 @@ ggplot(p,aes(x=rel_height, y=p_around, color=width, group=width)) +
   scale_x_continuous(breaks=c(-14, -10, -6, -2, 2)) +
   xlab('obstacle height (in. relative to max)') +
   ylab('P(around)')
-ggsave('propotions.pdf')
+ggsave('proportions.pdf')
 
 
 e <- na.omit(read.table('e1.csv', header=TRUE, sep=','))
