@@ -1,8 +1,8 @@
 """plots.py
 
 Usage:
-  plots.py export-data <exp-file> <csv-file> [--drop-outbound <drop-participants>]
-  plots.py export-proportions <exp-file> <csv-file> [--drop-outbound <drop-participants>]
+  plots.py export-data <exp-file> <csv-file> [--drop-outbound <drop-outbound> --drop-return <drop-return>]
+  plots.py export-proportions <exp-file> <csv-file> [--drop-outbound <drop-outbound> --drop-return <drop-return>]
 
 """
 import sys
@@ -36,9 +36,11 @@ def plot_proportions(df, by='relative_height'):
     plt.ylabel('P(around)')
 
 
-def load_data(filename, stack=True, collapse_unsuccesful=True, drop_outbound=None):
+def load_data(filename, stack=True, collapse_unsuccesful=True, drop_outbound=None, drop_return=None):
     if drop_outbound is None:
         drop_outbound = []
+    if drop_return is None:
+        drop_return = []
 
     df = Experiment.load(filename).dataframe.dropna()
     for column, type_ in [
@@ -50,6 +52,7 @@ def load_data(filename, stack=True, collapse_unsuccesful=True, drop_outbound=Non
         df[column] = df[column].astype(type_)
 
     df.loc[df.index.get_level_values('participant').isin(drop_outbound), 'outbound'] = None
+    df.loc[df.index.get_level_values('participant').isin(drop_return), 'return'] = None
 
     df['relative_height'] = df['height'] - df['lowest_height_not_afforded']
     df['scaled_height'] = df['height'] / df['lowest_height_not_afforded']
@@ -71,12 +74,16 @@ def load_data(filename, stack=True, collapse_unsuccesful=True, drop_outbound=Non
 def main():
     args = docopt(__doc__)
 
-    if args['<drop-participants>']:
-        drop = [int(p) for p in args['<drop-participants>'].split(',')]
+    if args['<drop-outbound>']:
+        drop_out = [int(p) for p in args['<drop-outbound>'].split(',')]
     else:
-        drop = []
+        drop_out = []
+    if args['<drop-return>']:
+        drop_return = [int(p) for p in args['<drop-return>'].split(',')]
+    else:
+        drop_return = []
 
-    df = load_data(args['<exp-file>'], drop_outbound=drop)
+    df = load_data(args['<exp-file>'], drop_outbound=drop_out, drop_return=drop_return)
 
     if args['export-proportions']:
         proportion(df, ['relative_height', 'width']).reset_index().to_csv(args['<csv-file>'], index=False)
