@@ -3,3 +3,8 @@ P1
 * always went around on return ("felt comfortable")
 * scuffed feet while walking
 
+P2
+--
+* only took height into account
+* always went around on return (thought he wasn't supposed to go over)
+
