@@ -6,6 +6,7 @@ from collections import defaultdict
 import sys
 from subprocess import call
 
+from getch import getch
 from toolz import curry
 from blessings import Terminal
 from pandas import Series
@@ -43,10 +44,17 @@ def trial_prompt(phase):
 {terminal.underline}a{terminal.normal}round? '.format(phase, len('outbound'), terminal=Terminal())
 
 
-def get_input(prompt, is_allowed):
+def get_input(prompt, is_allowed, single_key=False):
     result = None
     while not is_allowed(result):
-        result = input(prompt)
+        if single_key:
+            print(prompt, end=' ')
+            sys.stdout.flush()
+            result = getch()
+            print(result)
+            sys.stdout.flush()
+        else:
+            result = input(prompt)
     return result
 
 
@@ -70,7 +78,8 @@ def run_trial(experiment, trial):
     for phase in ('outbound', 'return'):
         results[phase] = RESULTS_BY_CODE[get_input(
             trial_prompt(phase),
-            contains(set(RESULTS_BY_CODE.keys()))
+            contains(set(RESULTS_BY_CODE.keys())),
+            single_key=True
         )]
     return results
 
