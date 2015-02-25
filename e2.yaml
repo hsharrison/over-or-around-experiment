@@ -9,6 +9,7 @@ design:
       - [height, !!null ]
       - [width, !!null ]
     design_matrix:
+      - [  2,  4.5]
       - [  2,  6  ]
       - [  2,  7.5]
       - [  2,  9  ]
