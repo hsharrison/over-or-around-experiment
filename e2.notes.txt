@@ -12,3 +12,12 @@ P8
 --
 * scuffed feet
 
+p11
+--
+* scuffed feet
+* only thought took hieght into account on outbound
+
+p12
+--
+* Always went around due to thinking it was easier
+* judged whether or not to go around bassed on hieght
