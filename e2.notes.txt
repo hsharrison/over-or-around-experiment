@@ -12,3 +12,7 @@ P8
 --
 * scuffed feet
 
+p11
+--
+* scuffed feet
+* only thought took hieght into account on outbound
