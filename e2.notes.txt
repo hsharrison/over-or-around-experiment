@@ -22,3 +22,8 @@ P12
 * Always went around on return due to thinking it was easier
 * judged whether or not to go around based on height
 
+P13
+---
+* Always went around on the return, a conscious decision
+* scuffed feet
+
