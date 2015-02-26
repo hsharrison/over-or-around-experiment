@@ -1,6 +1,6 @@
 design:
   - name: participant
-    n: 12
+    n: 20
 
   - name: trial
     n: 1
