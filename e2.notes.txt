@@ -32,3 +32,8 @@ P14
 * Always went around on the return
 * scuffed feet
 
+P15
+---
+* Always went around on the return, "felt natural"
+* Went over whenever possible, during first half of experiment
+
