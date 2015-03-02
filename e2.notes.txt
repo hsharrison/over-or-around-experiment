@@ -37,3 +37,7 @@ P15
 * Always went around on the return, "felt natural"
 * Went over whenever possible, during first half of experiment
 
+P17
+---
+* Always went around on the return, "felt easier"
+
