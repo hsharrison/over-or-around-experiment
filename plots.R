@@ -4,12 +4,20 @@ library(magrittr)
 library(plyr)
 library(binom)
 
-p <- read.table('props.csv', header=TRUE, sep=',')
+p <- read.table('e2-props.csv', header=TRUE, sep=',')
 names(p) <- c('rel_height', 'width', 'p_around')
 
-e <- na.omit(read.table('e1.csv', header=TRUE, sep=','))
+e <- na.omit(read.table('e2.csv', header=TRUE, sep=','))
 e$action <- ordered(e$action, c('over', 'around'))
 e$rel_height <- e$relative_height
+
+n_return_actions <- with(subset(e, e$phase == 'return'), tapply(action, list(participant), . %>% unique %>% length))
+drop_return_participants <- names(n_return_actions[n_return_actions == 1])
+e <- e[!(e$phase == 'return' & e$participant %in% drop_return_participants),]
+
+n_trials <- e$trial %>% unique %>% length
+e <- e[!with(e, participant == 15 & phase == 'outbound' & trial <= n_trials/2), ]
+
 
 e.totals <- ddply(e, .(rel_height, width), function(x) data.frame(total=nrow(x), around=sum(x$action == 'around')))
 e.totals$prop <- e.totals$around / e.totals$total
@@ -94,3 +102,13 @@ g %>%
   width_x %>% rel_height_y %>% p_over_color %>%
   plot_theme
 ggsave('tile.pdf')
+
+
+raw_fits <- by(p, list(width=p$width), function(df) {df %$% approx(p_around, scaled_height, xout=.5)})
+p50 <- data.frame(
+  rel_height=as.numeric(lapply(raw_fits, function(x) x$y)),
+  width=widths
+)
+g <- ggplot(p50, aes(x=width, y=rel_height)) + geom_line(size=2) + geom_point(size=4) + scale_y_continuous(breaks=rel_heights, name='{rel. height (in.) | P(around) = 0.5}') + stat_smooth(method='lm')
+g %>% width_x %>% plot_theme
+ggsave('50-perception-heights.pdf')
