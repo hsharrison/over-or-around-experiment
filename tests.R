@@ -2,11 +2,14 @@ library(Hmisc)
 library(magrittr)
 library(lme4)
 
+obstacle_distance <- 5
+
 e <- na.omit(read.table('e2.csv', header=TRUE, sep=','))
 e$action <- ordered(e$action, c('over', 'around'))
 for (col in c('participant', 'phase', 'gender')) {
   e[[col]] = as.factor(e[[col]])
 }
+e$angle <- atan((e$width/2) / obstacle_distance)
 
 n_return_actions <- with(subset(e, e$phase == 'return'), tapply(action, list(participant), . %>% unique %>% length))
 drop_return_participants <- names(n_return_actions[n_return_actions == 1])
