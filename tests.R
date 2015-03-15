@@ -1,6 +1,7 @@
 library(Hmisc)
 library(magrittr)
 library(lme4)
+library(boot)
 
 obstacle_distance <- 5
 
@@ -29,30 +30,47 @@ rel_height_only <- e.glmer(action ~ relative_height + (1 | participant))
 scaled_height_only <- e.glmer(action ~ scaled_height + (1 | participant))
 anova(cond_means, rel_height_only, test='ChiSquare')
 anova(cond_means, scaled_height_only, test='ChiSquare')
+mdl <- rel_height_only
 
 height_and_width <- e.glmer(action ~ relative_height + width + (1 | participant))
-anova(rel_height_only, height_and_width, test='ChiSquare')
+anova(mdl, height_and_width, test='ChiSquare')
+mdl <- height_and_width
 
 height_width_interaction <- e.glmer(action ~ relative_height * width + (1 | participant))
-anova(height_and_width, height_width_interaction, test='ChiSquare')
+anova(mdl, height_width_interaction, test='ChiSquare')
 
 height_random_effect <- e.glmer(action ~ relative_height + width + (1 + relative_height | participant))
-anova(height_and_width, height_random_effect, test='ChiSquare')
+anova(mdl, height_random_effect, test='ChiSquare')
+mdl <- height_random_effect
 
 width_random_effect <- e.glmer(action ~ relative_height + width + (1 + relative_height + width | participant))
-anova(height_random_effect, width_random_effect, test='ChiSquare')
+anova(mdl, width_random_effect, test='ChiSquare')
+mdl <- width_random_effect
 
 random_effect_interactions <- e.glmer(action ~ relative_height * width + (1 + relative_height + width | participant))
-anova(width_random_effect, random_effect_interactions, test='ChiSquare')
+anova(mdl, random_effect_interactions, test='ChiSquare')
 
 trial <- e.glmer(action ~ relative_height + width + trial + (1 + relative_height + width | participant))
-anova(width_random_effect, trial, test='ChiSquare')
+anova(mdl, trial, test='ChiSquare')
 
 gender <- e.glmer(action ~ relative_height + width + as.factor(gender) + (1 + relative_height + width | participant))
-anova(width_random_effect, gender, test='ChiSquare')
+anova(mdl, gender, test='ChiSquare')
 
 age <- e.glmer(action ~ relative_height + width + age + (1 + relative_height + width | participant))
-anova(width_random_effect, age, test='ChiSquare')
+anova(mdl, age, test='ChiSquare')
 
-mdl <- width_random_effect
+with_phase <- e.glmer(action ~ relative_height + width + phase + (1 + relative_height + width | participant))
+anova(mdl, with_phase, test='ChiSquare')
+mdl <- with_phase
+
+phase_height_int <- e.glmer(action ~ relative_height + width + phase + relative_height:phase +
+                            (1 + relative_height + width | participant))
+anova(mdl, phase_height_int, test='ChiSquare')
+mdl <- phase_height_int
+
+phase_width_int <- e.glmer(action ~ relative_height + width + phase + relative_height:phase + width:phase +
+                           (1 + relative_height + width | participant))
+anova(mdl, phase_width_int)
+
 summary(mdl)
+bootMer(mdl, fixef, nsim=1000, type='parametric', .progress='txt')
