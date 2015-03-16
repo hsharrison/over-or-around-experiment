@@ -103,17 +103,16 @@ add_labels <- function(g, xs, ys, labels) {g +
   annotate('text', x=xs, y=ys, label=labels, family=font.family, size=4)
 }
 
-g <- ggplot(e, aes(x=height, y=as.numeric(action)-1, group=participant)) +
-  stat_smooth(method='glm', family=binomial(link='logit'), se=FALSE, color='black')
-g %>%
-  height_x %>% binomial_y %>%
+g <- ggplot(e, aes(x=rel_height, y=as.numeric(action) - 1, group=width, color=width)) +
+  stat_summary(fun.y=mean, geom='line')
+g %>% rel_height_x %>% binomial_y %>% width_color_scale %>%
   plot_theme
 
-g <- ggplot(e, aes(x=rel_height, y=as.numeric(action)-1, group=width)) +
-  stat_smooth(method='glm', family=binomial(link='logit'), se=FALSE, color='black')
-g %>%
-  rel_height_x %>% binomial_y %>%
+g <- ggplot(e, aes(x=mutual_scale, y=as.numeric(action) - 1, group=width, color=width)) +
+  stat_summary(fun.y=mean, geom='line')
+g %>% mutual_scale_x %>% binomial_y %>% width_color_scale %>%
   plot_theme
+
 
 g <- ggplot(e.totals, aes(x=rel_height, y=prop, ymin=ci.low, ymax=ci.high, color=width, group=width)) +
   geom_line(size=2) + geom_point(size=3) + geom_errorbar(width=2, size=1, position=position_dodge(width=1.75))
@@ -124,19 +123,23 @@ ggsave('proportions.pdf')
 
 g <- ggplot(e.totals, aes(x=rel_height, y=prop, ymin=ci.low, ymax=ci.high, color=width, group=width)) +
   geom_line(size=2) + geom_point(size=3.5)
-g %>%
+g <- g %>%
   rel_height_x %>% p_y %>% width_color_scale_bw %>%
-  direct.label(., method=list(gapply.fun(d[-(1:3),]), first.qp, calc.boxes, hjust=0.5, draw.rects, fontfamily=font.family, cex=0.7)) %>%
+  direct.label(., method=list(gapply.fun(d[-(1:3),]), first.qp, calc.boxes, hjust=0.5, function(d, ...) {
+    d$w <- d$w + 0.22
+    d$h <- d$h + 0.22
+    d[4, 'y'] <- d[4, 'y'] + 0.22
+    d$x <- d$x - 0.85
+    d$y <- c(3, 4.36, 5, 5.7, 6.4, 7.35)
+    return(d)
+  }, draw.rects,
+  fontfamily=font.family, cex=0.9, colour='black')) %>%
   plot_theme_bw
-ggsave('proportions_bw.pdf')
+g
+ggsave('proportions_bw.png')
 
-g <- ggplot(e.totals, aes(x=rel_height, y=prop, ymin=ci.low, ymax=ci.high, color=width, group=width)) +
-  geom_line(size=2) + geom_point(size=3.5) + geom_errorbar(position=position_dodge(width=0.75))
-g %>%
-  rel_height_x %>% p_y %>% width_color_scale_bw %>%
-  direct.label(., method=list(gapply.fun(d[-(1:3),]), first.qp, calc.boxes, hjust=0.5, draw.rects, fontfamily=font.family, cex=0.7)) %>%
-  plot_theme_bw
-ggsave('proportions_bw_error.pdf')
+g + geom_errorbar(position=position_dodge(width=0.75))
+ggsave('proportions_bw_error.png')
 
 g <- ggplot(e, aes(y=as.numeric(action)-1, x=rel_height, color=width, group=width)) +
   geom_point(position=position_jitter(h=0.07, w=0.8)) +
@@ -180,7 +183,7 @@ g %>%
     labels=rel_heights
   ) %>%
   plot_theme_bw
-ggsave('by-width_bw.pdf')
+ggsave('by-width_bw.png')
 
 g <- ggplot(e.totals, aes(x=width, y=1-prop, ymax=1-ci.low, ymin=1-ci.high, group=rel_height, color=rel_height, label=rel_height)) +
   geom_line(size=2) + geom_point(size=4) + geom_errorbar(position=position_dodge(width=0.3))
@@ -191,7 +194,7 @@ g %>%
              labels=rel_heights
   ) %>%
   plot_theme_bw
-ggsave('by-width_bw_error.pdf')
+ggsave('by-width_bw_error.png')
 
 g <- ggplot(e.totals, aes(x=width, y=rel_height, fill=1-prop)) + geom_tile()
 g %>% 
