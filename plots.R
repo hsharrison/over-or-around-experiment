@@ -51,7 +51,7 @@ plot_theme_bw <- function(g) {g +
     panel.grid.minor=element_blank(),
     panel.border=element_blank(),
     axis.line=element_line(size = 0.7, color="black"),
-    text=element_text(size=13, family=font.family),
+    text=element_text(size=20, family=font.family),
     legend.position='none'
   )
 }
@@ -99,12 +99,12 @@ rel_height_y <- function(g) {g +
   scale_y_continuous(breaks=rel_heights, name='obstacle height (in. relative to max)')
 }
 
-add_labels <- function(g, xs, ys, labels) {g +
-  annotate('text', x=xs, y=ys, label=labels, family=font.family, size=4)
+add_labels <- function(g, xs, ys, labels, size=6) {g +
+  annotate('text', x=xs, y=ys, label=labels, family=font.family, size=size)
 }
 
-g <- ggplot(e, aes(x=rel_height, y=as.numeric(action) - 1, group=width, color=width)) +
-  stat_summary(fun.y=mean, geom='line')
+g <- ggplot(e, aes(x=rel_height, y=as.numeric(action) - 1, group=interaction(participant, width), color=width)) +
+  stat_summary(fun.y=mean, geom='line', position=position_jitter())
 g %>% rel_height_x %>% binomial_y %>% width_color_scale %>%
   plot_theme
 
@@ -126,14 +126,14 @@ g <- ggplot(e.totals, aes(x=rel_height, y=prop, ymin=ci.low, ymax=ci.high, color
 g <- g %>%
   rel_height_x %>% p_y %>% width_color_scale_bw %>%
   direct.label(., method=list(gapply.fun(d[-(1:3),]), first.qp, calc.boxes, hjust=0.5, function(d, ...) {
-    d$w <- d$w + 0.22
-    d$h <- d$h + 0.22
+    d$w <- d$w + 0.25
+    d$h <- d$h + 0.25
     d[4, 'y'] <- d[4, 'y'] + 0.22
-    d$x <- d$x - 0.85
-    d$y <- c(3, 4.36, 5, 5.7, 6.4, 7.35)
+    d$x <- d$x - 0.675
+    d$y <- c(2.8, 3.85, 4.63, 5.38, 6.2, 7.15) + 0.15
     return(d)
   }, draw.rects,
-  fontfamily=font.family, cex=0.9, colour='black')) %>%
+  fontfamily=font.family, cex=1.25, colour='black')) %>%
   plot_theme_bw
 g
 ggsave('proportions_bw.png')
@@ -174,27 +174,20 @@ ggsave('by-width.pdf')
 
 g <- ggplot(e.totals, aes(x=width, y=1-prop, ymax=1-ci.low, ymin=1-ci.high, group=rel_height, color=rel_height, label=rel_height)) +
   geom_line(size=2) + geom_point(size=4) #+ geom_errorbar(position=position_dodge(width=0.5))
-g %>%
+g <- g %>%
   width_x %>% p_over_y %>% rel_height_color_bw %>%
   #direct.label(., list(gapply.fun(d[-(1:3),]), first.bumpup, calc.boxes, enlarge.box, draw.rects, family=font.family, cex=0.75)) %>%
   add_labels(.,
-    xs=rep(12.35, each=7),
+    xs=rep(12.6, each=7),
     ys=1 - e.totals[e.totals$width == widths[length(widths)],'prop'],
     labels=rel_heights
   ) %>%
   plot_theme_bw
-ggsave('by-width_bw.png')
+g
+ggsave('by-width_bw.png', width=5, height=5)
 
-g <- ggplot(e.totals, aes(x=width, y=1-prop, ymax=1-ci.low, ymin=1-ci.high, group=rel_height, color=rel_height, label=rel_height)) +
-  geom_line(size=2) + geom_point(size=4) + geom_errorbar(position=position_dodge(width=0.3))
-g %>%
-  width_x %>% p_over_y %>% rel_height_color_bw %>%  add_labels(.,
-             xs=rep(12.35, each=7),
-             ys=1 - e.totals[e.totals$width == widths[length(widths)],'prop'],
-             labels=rel_heights
-  ) %>%
-  plot_theme_bw
-ggsave('by-width_bw_error.png')
+g + geom_errorbar(position=position_dodge(width=0.3))
+ggsave('by-width_bw_error.png', width=5, height=5)
 
 g <- ggplot(e.totals, aes(x=width, y=rel_height, fill=1-prop)) + geom_tile()
 g %>% 
