@@ -37,11 +37,11 @@ def horizontal_rule():
     big_print(17 * '=')
 
 
-def trial_prompt(phase):
+def trial_prompt(phase, max_phase_len=len('outbound')):
     return '{0:{1}}: \
 {terminal.underline}u{terminal.normal}nsuccessful, \
 {terminal.underline}o{terminal.normal}ver or \
-{terminal.underline}a{terminal.normal}round? '.format(phase, len('outbound'), terminal=Terminal())
+{terminal.underline}a{terminal.normal}round? '.format(phase, max_phase_len, terminal=Terminal())
 
 
 def get_input(prompt, is_allowed, single_key=False):
@@ -72,12 +72,13 @@ def show_trial(data):
 
 
 def run_trial(experiment, trial):
+    phases = experiment.data.get('phases', ('outbound', 'return'))
     trial.data['height'] += trial.data['lowest_height_not_afforded']
     show_trial(trial.data)
     results = {'time': datetime.now()}
-    for phase in ('outbound', 'return'):
+    for phase in phases:
         results[phase] = RESULTS_BY_CODE[get_input(
-            trial_prompt(phase),
+            trial_prompt(phase,  max(len(phase_) for phase_ in phases)),
             contains(set(RESULTS_BY_CODE.keys())),
             single_key=True
         )]

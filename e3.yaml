@@ -1,0 +1,17 @@
+design:
+  - name: participant
+    n: 12
+
+  - name: block
+    n: 4
+    ivs:
+        width: [4.5, 12]
+
+  - name: trial
+    order: Sorted
+    ivs:
+        height: [-14, -12, -10, -8, -6, -4, -2, 0]
+
+filename: e3.exp
+goal_distance: 5
+phases: [outbound]
