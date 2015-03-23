@@ -1,4 +1,4 @@
 toolz==0.7.1
 blessings==1.6
-experimentator==0.2.4
+experimentator==0.2.5
 seaborn==0.5.1
