@@ -1,0 +1,5 @@
+p2
+--
+
+Reported that action selection was based on whether he could step over.
+
