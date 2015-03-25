@@ -2,9 +2,9 @@ from contextlib import contextmanager
 from datetime import datetime
 from operator import contains
 from decimal import Decimal
-from collections import defaultdict
 import sys
 from subprocess import call
+import random
 
 from getch import getch
 from toolz import curry
@@ -24,13 +24,14 @@ MEASUREMENTS = [
     'hip_height',
     'lowest_height_not_afforded',
 ]
-UNITS_BY_FIELD = defaultdict(str)
-UNITS_BY_FIELD['height'] = 'in'
-UNITS_BY_FIELD['width'] = 'ft'
+UNITS_BY_FIELD = {
+    'height': 'in.',
+    'width': 'ft.',
+}
 
 
 def big_print(*args):
-    call(['toilet', '-w', '120', ' '.join(args)])
+    call(['toilet', '-w', '140', ' '.join(map(str, args))])
 
 
 def horizontal_rule():
@@ -58,21 +59,34 @@ def get_input(prompt, is_allowed, single_key=False):
     return result
 
 
+def show_data(data, order=None, print_func=big_print):
+    if order is None:
+        order = list(data.keys())
+
+    info = Series(data)
+    lines = str(info).split('\n')
+    lines_by_field = {line.split()[0]: line for line in lines}
+
+    for field in order:
+        if field in info:
+            to_print = [lines_by_field[field]]
+            if field in UNITS_BY_FIELD:
+                to_print.append(UNITS_BY_FIELD[field])
+            print_func(*to_print)
+
+
 def show_trial(data):
     horizontal_rule()
 
-    fields = ('trial', 'width', 'height')
-    info = Series({field: data[field] for field in fields})
+    possible_fields = ('trial', 'width', 'height')
+    info = {'trial': '{block}.{trial}'.format(**data) if 'block' in data else data['trial']}
+    info.update({field: data[field] for field in possible_fields[1:] if field in data.maps[0]})
 
-    # To force the lines to print in a certain order.
-    lines = str(info).split('\n')
-    lines_by_field = {line.split()[0]: line for line in lines}
-    for field in fields:
-        big_print(lines_by_field[field], UNITS_BY_FIELD[field])
+    show_data(info, order=possible_fields)
 
 
 def run_trial(experiment, trial):
-    phases = experiment.data.get('phases', ('outbound', 'return'))
+    phases = experiment.experiment_data.get('phases', ('outbound', 'return'))
     trial.data['height'] += trial.data['lowest_height_not_afforded']
     show_trial(trial.data)
     results = {'time': datetime.now()}
@@ -101,6 +115,18 @@ gender? ({t.underline}m{t.normal}ale, {t.underline}f{t.normal}emale, {t.underlin
     participant.data['age'] = int(get_input('age? ', castable_to(int)))
 
 
+@contextmanager
+def setup_block(experiment, block):
+    block.data['side'] = random.choice('AB')
+    fields = ('block', 'width', 'side')
+    show_data({field: block.data[field] for field in fields}, order=fields)
+    horizontal_rule()
+
+    input('press ENTER to continue')
+    yield
+    horizontal_rule()
+
+
 @curry
 def castable_to(type_, value):
     try:
@@ -113,6 +139,8 @@ def castable_to(type_, value):
 def main():
     experiment = Experiment.from_yaml_file(sys.argv[1])
     experiment.set_context_manager('participant', setup_participant)
+    if 'block' in experiment.levels:
+        experiment.set_context_manager('block', setup_block)
     experiment.set_run_callback(run_trial)
     experiment.save()
     return 0
