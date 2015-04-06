@@ -10,7 +10,7 @@ library(tikzDevice)
 
 obstacle_distance <- 5
 
-e <- na.omit(read.table('e2.csv', header=TRUE, sep=','))
+e <- na.omit(read.table('exp2/e2.csv', header=TRUE, sep=','))
 e$action <- ordered(e$action, c('over', 'around'))
 for (col in c('participant', 'phase', 'gender')) {
   e[[col]] = as.factor(e[[col]])
