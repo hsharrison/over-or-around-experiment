@@ -181,12 +181,12 @@ g <- g %>%
   width_x %>% p_over_y %>% rel_height_color_bw %>%
   #direct.label(., list(gapply.fun(d[-(1:3),]), first.bumpup, calc.boxes, enlarge.box, draw.rects, family=font.family, cex=0.75)) %>%
   add_labels(.,
-    xs=rep(12.6, each=7),
+    xs=rep(13, each=7),
     ys=1 - e.totals[e.totals$width == widths[length(widths)],'prop'],
-    labels=rel_heights
+    labels=sapply(rel_heights, . %>% paste('in.'))
   ) %>%
   plot_theme_bw
-g
+g + coord_cartesian(xlim=c(4.3, 13.7))
 ggsave('by-width_bw.png', width=5, height=5)
 
 g + geom_errorbar(position=position_dodge(width=0.3))
