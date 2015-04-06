@@ -9,6 +9,8 @@ loadfonts()
 e <- read.table('e3.csv', header=TRUE, sep=',')
 e$action <- ordered(e$outbound, c('over', 'around'))
 e$order <- as.factor(e$sorted_order)
+e$height <- e$height + 1
+e$lowest_height_not_afforded <- e$lowest_height_not_afforded + 1
 e$relative_height <- e$height - e$lowest_height_not_afforded
 e$scaled_height <- e$height / e$lowest_height_not_afforded
 obstacle_distance <- 5

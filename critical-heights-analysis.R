@@ -17,6 +17,8 @@ for (col in c('participant', 'phase', 'gender')) {
 }
 e$tan_angle <- (e$width/2) / obstacle_distance
 e$angle <- atan(e$tan_angle)
+e$height <- e$height + 1
+e$lowest_height_not_afforded <- e$lowest_height_not_afforded + 1
 
 n_return_actions <- with(subset(e, e$phase == 'return'), tapply(action, list(participant), . %>% unique %>% length))
 drop_return_participants <- names(n_return_actions[n_return_actions == 1])

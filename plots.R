@@ -18,6 +18,9 @@ names(p) <- c('rel_height', 'width', 'p_around')
 e <- na.omit(read.table('e2.csv', header=TRUE, sep=','))
 e$action <- ordered(e$action, c('over', 'around'))
 e$rel_height <- e$relative_height
+e$height <- e$height + 1
+e$lowest_height_not_afforded <- e$lowest_height_not_afforded + 1
+e$scaled_height <- e$height / e$lowest_height_not_afforded
 e$tan_angle <- (e$width / 2) / obstacle_distance
 e$angle <- atan(e$angle)
 e$mutual_scale <- with(e, scaled_height - angle_coefficient * tan_angle)
