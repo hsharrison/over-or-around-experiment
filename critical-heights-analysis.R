@@ -95,7 +95,6 @@ summary(mer_scaled_height)
 without_width_raneff <- lmer(scaled_height ~ width + (1 | participant), scaled_height.50)
 anova(without_width_raneff, mer_scaled_height)
 summary(without_width_raneff)
-mer.boot <- bootMer(without_width_raneff, fixef, nsim=10000, type='parametric', .progress='txt')
 
 ci <- without_width_raneff %>%
   bootMer(fixef, nsim=10000, type='parametric', .progress='txt') %>%
