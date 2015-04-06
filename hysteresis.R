@@ -51,14 +51,15 @@ width_x <- scale_x_continuous(breaks=widths, name='Obstacle width (ft.)')
 crit_scaled_height_y <- scale_y_continuous(name=expression(frac(h[crit.], h[max])), limits=c(0.5, 1))
 upright_ylabel <- theme(axis.title.y=element_text(angle=0))
 theme <- theme_few(base_size=font.size, base_family=font.family)
-order_color <- scale_colour_few()
+order_color <- scale_fill_few(palette='light')
+p_color <- scale_color_manual(values=c(few_pal('dark')(7), few_pal('medium')(2)), guide='none')
 width_offset <- 4
 
 ggplot(scaled_height.50, aes(x=width, y=scaled_height.5, fill=order, group=interaction(width, order))) +
-   stat_boxplot(position='dodge', width=8) +
-   stat_summary(aes(group=interaction(width, participant), #color=as.factor(participant),
-                x=width + width_offset/2 - width_offset*(order=='ascending')),
+   stat_boxplot(position='dodge', width=8, size=1) +
+   stat_summary(aes(group=interaction(width, participant), color=as.factor(participant),
+                    x=width + width_offset/2 - width_offset*(order=='ascending')),
                 fun.y=mean,
-                linetype='dashed',
-                geom='line') +
-   width_x + theme + order_color + upright_ylabel + crit_scaled_height_y
+                geom='line',
+                size=1.5) +
+   width_x + theme + upright_ylabel + order_color + crit_scaled_height_y + p_color
