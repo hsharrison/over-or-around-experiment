@@ -88,7 +88,8 @@ ggplot(scaled_height.50, aes(x=width, y=scaled_height)) +
                fun.ymax=. %>% {mean(.) + sem(.)},
                fun.ymin=. %>% {mean(.) - sem(.)}
   ) +
-  width_x + plot_theme_bw + no_x_grid + crit_scaled_height_y  + upright_ylabel
+  width_x + plot_theme_bw + no_x_grid + crit_scaled_height_y  + upright_ylabel +
+  coord_cartesian(ylim=c(0.5, 1))
 ggsave('critical_scaled_heights.png', width=fig.dims[1], height=fig.dims[2])
 mer_scaled_height <- lmer(scaled_height ~ width + (1 + width | participant), scaled_height.50)
 summary(mer_scaled_height)
