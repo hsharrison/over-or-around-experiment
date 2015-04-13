@@ -52,7 +52,7 @@ crit_scaled_height_y <- scale_y_continuous(name=expression(frac(h[crit.], h[max]
 upright_ylabel <- theme(axis.title.y=element_text(angle=0))
 theme <- theme_few(base_size=font.size, base_family=font.family)
 order_color <- scale_fill_few(palette='light')
-p_color <- scale_color_manual(values=c(few_pal('dark')(7), few_pal('medium')(2)), guide='none')
+p_color <- scale_color_manual(values=c(few_pal('dark')(7), few_pal('medium')(5)), guide='none')
 width_offset <- 4
 
 ggplot(scaled_height.50, aes(x=width, y=scaled_height.5, fill=order, group=interaction(width, order))) +
