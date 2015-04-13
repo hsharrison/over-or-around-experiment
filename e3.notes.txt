@@ -3,3 +3,8 @@ p2
 
 Reported that action selection was based on whether he could step over.
 
+p10
+---
+
+"I do not consider myself lazy."
+Stepped over even when it felt "lazier" to walk around.
