@@ -82,3 +82,4 @@ ggplot(data, aes(x=width, y=scaled_height.50, fill=order, group=interaction(widt
                 geom='line',
                 size=1.5) +
    width_x + theme + upright_ylabel + order_color + crit_scaled_height_y + p_color
+ggsave('hysteresis.png', height = 9, width = 8)
