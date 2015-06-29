@@ -83,3 +83,13 @@ ggplot(data, aes(x=width, y=scaled_height.50, fill=order, group=interaction(widt
                 size=1.5) +
    width_x + theme + upright_ylabel + order_color + crit_scaled_height_y + p_color
 ggsave('hysteresis.png', height = 9, width = 8)
+
+# Modeling.
+means <- lm(h_crit ~ 1, data)
+h_max <- lm(h_crit ~ h_max, data)
+width <- lm(h_crit ~ h_max + width, data)
+order <- lm(h_crit ~ h_max + width + order, data)
+order_width_int <- lm(h_crit ~ h_max + width*order, data)
+anova(means, h_max, width, order, order_width_int)
+summary(order)
+anova(lm(h_crit ~ h_max*order*width, data))
