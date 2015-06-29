@@ -34,7 +34,29 @@ sem <- function(x) {
 
 ddply.fun <- function(d, predictor, p=.5) {
   result <- d[1, apply(d, 2, . %>% unique %>% length %>% equals(1))]
-  result[[paste(predictor, p %>% as.character %>% strsplit('.', fixed=TRUE) %>% extract2(1) %>% extract(2), sep='.')]] <- d %>% simple_glm(predictor) %>% p.glm(p=p)
+  new_col_name <- paste(predictor, p %>% as.character %>% strsplit('.', fixed=TRUE) %>% extract2(1) %>% extract(2), sep='.')
+  
+  if ('action' %in% names(result)) {
+    result$switched <- FALSE
+    
+    if (result[1, 'action'] == 'over') {
+      # Always went over. Set switching point to maximum height.
+      result[[new_col_name]] <- d[d$relative_height == 0, predictor]
+    } else {
+      # Always went around. Set switching point to in-between the lowest height and what the next lowest would be if the sequence continued.
+      height <- min(d$height) - d$height %>% diff %>% mean %>% abs %>% divide_by(2)
+      if (predictor == 'scaled_height') {
+        result[[new_col_name]] <- height / result$lowest_height_not_afforded
+      } else if (predictor == 'relative_height') {
+        result[[new_col_name]] <- height - result$lowest_height_not_afforded
+      }
+    }
+    
+  } else {
+    result$switched <- TRUE
+    result[[new_col_name]] <- d %>% simple_glm(predictor) %>% p.glm(p=p)
+  }
+  
   result$sorted_order <- NULL
   return(result)
 }
