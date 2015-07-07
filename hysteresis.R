@@ -67,7 +67,7 @@ font.size <- 20
 
 widths <- e %>% extract2('width') %>% unique
 width_x <- scale_x_continuous(breaks=widths, name='Obstacle width (ft.)')
-crit_scaled_height_y <- scale_y_continuous(name=expression(frac(h[crit.], h[max])), limits=c(0.5, 1))
+crit_scaled_height_y <- scale_y_continuous(name=expression(frac(h[crit.], h[max])))
 upright_ylabel <- theme(axis.title.y=element_text(angle=0))
 theme <- theme_few(base_size=font.size, base_family=font.family)
 order_color <- scale_fill_few(palette='light')
@@ -81,8 +81,23 @@ ggplot(data, aes(x=width, y=scaled_height.50, fill=order, group=interaction(widt
                 fun.y=mean,
                 geom='line',
                 size=1.5) +
-   width_x + theme + upright_ylabel + order_color + crit_scaled_height_y + p_color
-ggsave('hysteresis.png', height = 9, width = 8)
+   width_x + theme + upright_ylabel + order_color + crit_scaled_height_y + p_color +
+  coord_cartesian(ylim = c(0.5, 1))
+ggsave('hysteresis_boxplot.png', height = 9, width = 8)
+
+ggplot(data, aes(x=width, y=scaled_height.50, fill=order, group=interaction(width, order))) +
+  stat_summary(geom='bar', position='dodge', fun.y=mean) +
+  stat_summary(geom='errorbar', position='dodge', size = 1,
+               fun.ymax=. %>% {mean(.) + sem(.)},
+               fun.ymin=. %>% {mean(.) - sem(.)}) +
+  stat_summary(aes(group=interaction(width, participant), color=as.factor(participant),
+                   x=width + width_offset/2 - width_offset*(order=='ascending')),
+               fun.y=mean,
+               geom='line',
+               size=1.5) +
+  width_x + theme + upright_ylabel + order_color + crit_scaled_height_y + p_color +
+  coord_cartesian(ylim = c(0.5, 1))
+ggsave('hysteresis_bar.png', height = 9, width = 8)
 
 # Modeling.
 means <- lm(h_crit ~ 1, data)
