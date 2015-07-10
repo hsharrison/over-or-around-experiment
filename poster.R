@@ -82,6 +82,25 @@ relative_height_label <- expression(h[obs.] - h[max.]~~plain('(in.)'))
 width_label <- expression(w[obs.]~~plain('(ft.)'))
 p_around_label = expression(P(around))
 
+fix_label <- function(label, realign = TRUE) {
+  if (label %>% as.numeric %>% is_greater_than(0)) {
+    if (substr(label, 1, 1) == ' ') {
+      if (realign) {
+        sign_pos <- 1
+      } else {
+        sign_pos <- nchar(label) - label %>% as.numeric %>% as.character %>% nchar
+      }
+      substr(label, sign_pos, sign_pos) <- '+'
+    } else {
+      warning('not enough space')
+    }
+  } else if (realign) {
+    elems <- strsplit(label, '-')[[1]]
+    label <- paste('-', elems[1], elems[2], sep = '')
+  }
+  return(label)
+}
+
 # By width.
 setEPS()
 postscript('proportions_by_width.eps', width = 10, height = 8)
@@ -97,7 +116,11 @@ ggplot(condition_data, aes(
   geom_hline(y = 0.5, size = 0.5, linetype = 'dotted') +
   geom_line(size = 2) +
   geom_errorbar(size = 1, position = 'dodge') +
-  scale_x_continuous(breaks = relative_heights, name = relative_height_label) +
+  scale_x_continuous(
+    breaks = relative_heights,
+    name = relative_height_label,
+    labels = relative_heights %>% format %>% aaply(., 1 , . %>% fix_label(. , realign = FALSE))
+  ) +
   scale_y_continuous(name = p_around_label) +
   scale_color_gradient(breaks = widths, name = width_label, guide = 'legend',
                        low = '#56B4E9', high = 'black') +
@@ -111,7 +134,7 @@ dev.off()
 
 # By height.
 setEPS()
-cairo_ps('proportions_by_height.eps', width = 11, height = 7.5)
+cairo_ps('proportions_by_height.eps', width = 11.5, height = 7.5)
 showtext.begin()
 ggplot(condition_data, aes(
   x = width,
@@ -127,14 +150,21 @@ ggplot(condition_data, aes(
   geom_ribbon(alpha = 0.1, size = 0) +
   scale_x_continuous(breaks = widths, name = width_label) +
   scale_y_continuous(name = p_around_label) +
-  scale_color_continuous(breaks = rev(relative_heights), name = relative_height_label, guide = 'legend',
-                         low = 'black', high = 'green') +
+  scale_color_continuous(
+    breaks = relative_heights %>% rev,
+    labels = relative_heights %>% rev %>% format %>% aaply(., 1 , . %>% fix_label(realign = FALSE)),
+    name = relative_height_label,
+    low = 'black', high = 'green'
+  ) +
   scale_fill_continuous(low = 'black', high = 'green', guide = FALSE) +
   geom_rangeframe(color = 'black') +
   theme_tufte(base_size = 26, base_family = 'Arial') +
   theme(
     axis.title.y = element_text(angle = 0)
-  )
+  ) +
+  guides(color = guide_legend(
+    keyheight = 2
+  ))
 dev.off()
 
 # Determine critical heights per participant-condition.
