@@ -50,10 +50,19 @@ phase_mdl <- update(best_mdl, . ~ . + phase)
 anova(best_mdl, phase_mdl)
 best_mdl <- phase_mdl
 
+phase_ranef <- update(best_mdl, . ~. + (phase|participant))
+anova(best_mdl, phase_ranef)
+best_mdl <- phase_ranef
+
+both_ranefs <- update(best_mdl, . ~ . + (width|participant))
+anova(phase_ranef, both_ranefs)
+best_mdl <- both_ranefs
+
+
 # Determine proportions at each width-height.
 condition_data <- ddply(trial_data, .(relative_height, width), summarise,
-  n = length(action),
-  n_around = sum(action == 'around')
+                        n = length(action),
+                        n_around = sum(action == 'around')
 )
 confints <- with(condition_data, binom.confint(n_around, n, method = 'wilson'))
 condition_data$p_around <- confints$mean
@@ -85,19 +94,19 @@ ggplot(condition_data, aes(
   color = width,
   group = width
 )) +
-  geom_hline(y = 0.5, size = 0.5, linetype = 'dotted') + 
+  geom_hline(y = 0.5, size = 0.5, linetype = 'dotted') +
   geom_line(size = 2) +
   geom_errorbar(size = 1, position = 'dodge') +
   scale_x_continuous(breaks = relative_heights, name = relative_height_label) +
   scale_y_continuous(name = p_around_label) +
   scale_color_gradient(breaks = widths, name = width_label, guide = 'legend',
                        low = '#56B4E9', high = 'black') +
-  geom_rangeframe(color = 'black') + 
+  geom_rangeframe(color = 'black') +
   theme_tufte(base_size = 26, base_family = 'Arial') +
   theme(
     axis.title.y = element_text(angle = 0),
     legend.position = 'top'
-)
+  )
 dev.off()
 
 # By height.
@@ -125,7 +134,7 @@ ggplot(condition_data, aes(
   theme_tufte(base_size = 26, base_family = 'Arial') +
   theme(
     axis.title.y = element_text(angle = 0)
-)
+  )
 dev.off()
 
 # Determine critical heights per participant-condition.
@@ -145,61 +154,60 @@ sem <- function(x) {
 
 ddply.fun <- function(d, p = .5) {
   result <- d[1, apply(d, 2, . %>% unique %>% length %>% equals(1))]
-  
+
   if ('action' %in% names(result)) {
     result$switched <- FALSE
-    
+
     if (result[1, 'action'] == 'over') {
       # Always went over. Set switching point to maximum height.
-      result$h_crit <- result$h_max    
+      result$h_crit <- result$h_max
     } else {
       # Always went around. Set switching point to in-between the lowest height and what the next lowest would be if the sequence continued.
       result$h_crit <- min(d$height) - d$height %>% diff %>% mean %>% abs %>% divide_by(2)
     }
     result$action <- NULL
-    
+
   } else {
     result$switched <- TRUE
     result$h_crit <- d %>% h_crit_glm %>% p.glm
   }
-  
+
   result$sorted_order <- NULL
   result$n <- nrow(d)
   return(result)
 }
 
-crit_data$phase <- NULL
 crit_data <- ddply(trial_data, .(participant, width), ddply.fun)
+crit_data$phase <- NULL
 crit_data$hmax_scaled_crit_height <- crit_data$h_crit / crit_data$h_max
 crit_data$rel_crit_height <- crit_data$h_crit - crit_data$h_max
 crit_data$hip_scaled_crit_height <- crit_data$h_crit / crit_data$hip_height
 crit_data$knee_scaled_crit_height <- crit_data$h_crit / crit_data$knee_height
+crit_data$double_tan_angle <- 2 * crit_data$tan_angle
 
 means_mdl <- lmer(h_crit ~ (1|participant), crit_data, REML = FALSE)
 h_max_mdl <- lmer(h_crit ~ h_max + (1|participant), crit_data, REML = FALSE)
 h_hip_mdl <- lmer(h_crit ~ hip_height + (1|participant), crit_data, REML = FALSE)
 h_knee_mdl <- lmer(h_crit ~ knee_height + (1|participant), crit_data, REML = FALSE)
-anova(means_mdl, h_max_mdl, h_hip_mdl, h_knee_mdl, test = 'ChiSq')
-best_mdl <- h_max_mdl
+anova(means_mdl, h_max_mdl, test = 'ChiSq')
+anova(means_mdl, h_hip_mdl, test = 'ChiSq')
+anova(means_mdl, h_knee_mdl, test = 'ChiSq')
 
-without_intercept <- update(best_mdl, . ~ . - 1)
-anova(without_intercept, best_mdl)
-best_mdl <- without_intercept
+double_tan_hip_mdl <- lmer(h_crit ~ hip_height + double_tan_angle + (1|participant), crit_data, REML = FALSE)
+anova(h_hip_mdl, double_tan_hip_mdl, test = 'ChiSq')
+anova(double_tan_hip_mdl, update(double_tan_hip_mdl, . ~ . + (double_tan_angle|participant)), test = 'ChiSq')
 
-tan_angle_mdl <- update(best_mdl, . ~ . + double_tan_angle)
-angle_mdl <- update(best_mdl, . ~ . + angle)
-anova(best_mdl, tan_angle_mdl, angle_mdl, test = 'ChiSq')
-best_mdl <- tan_angle_mdl
+double_tan_hmax_mdl <- lmer(h_crit ~ h_max + double_tan_angle + (1|participant), crit_data, REML = FALSE)
+anova(h_max_mdl, double_tan_hmax_mdl, test = 'ChiSq')
+anova(double_tan_hmax_mdl, update(double_tan_hmax_mdl, . ~ . + (double_tan_angle|participant)), test = 'ChiSq')
 
-tan_angle_ranef <- update(best_mdl, . ~ . + (tan_angle|participant))
-anova(best_mdl, tan_angle_ranef)
+confint(double_tan_hmax_mdl, method = 'boot', nsim = 10000)
 
-summary(best_mdl)
-anova(best_mdl, update(best_mdl, . ~ . + knee_height))
-anova(best_mdl, update(best_mdl, . ~ . + hip_height))
+hmax_hip_angle_mdl <- lmer(h_crit ~ h_max + hip_height + double_tan_angle + (1|participant), crit_data, REML = FALSE)
+anova(double_tan_hmax_mdl, hmax_hip_angle_mdl, test = 'ChiSq')
+confint(hmax_hip_angle_mdl, method = 'boot', nsim = 1000)
 
 # Critical-heights plot.
-crit_data$double_tan_angle <- 2*crit_data$tan_angle
 plotted_model <- lm(hmax_scaled_crit_height ~ double_tan_angle, crit_data)
 intercept <- coef(plotted_model)[['(Intercept)']]
 slope <- coef(plotted_model)[['double_tan_angle']]
