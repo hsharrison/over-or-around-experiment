@@ -245,8 +245,8 @@ plotted_model <- lm(hmax_scaled_crit_height ~ double_tan_angle, crit_data)
 intercept <- coef(plotted_model)[['(Intercept)']]
 slope <- coef(plotted_model)[['double_tan_angle']]
 
-tan_angle_label = expression(w[obs.] / d[obs.])
-scaled_crit_height_label <- expression(frac(h[crit.], h[max.]))
+tan_angle_label = expression(italic(w)[obs.] / italic(d)[obs.])
+scaled_crit_height_label <- expression(frac(italic(h)[crit.], italic(h)[max.]))
 
 setEPS()
 cairo_ps('critical_heights.eps', width = 9, height = 7)
