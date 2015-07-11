@@ -8,6 +8,9 @@ library(lme4)
 library(binom)
 library(showtext)
 
+font.add("Arial", regular = "arial.ttf",
+         bold = "arialbd.ttf", italic = "ariali.ttf", bolditalic = "arialbi.ttf")
+
 obstacle_distance <- 5
 
 ## Load raw data.
