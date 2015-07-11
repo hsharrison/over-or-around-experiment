@@ -78,8 +78,8 @@ relative_heights <- get_unique(trial_data, 'relative_height')
 
 
 # Raw data plots.
-relative_height_label <- expression(h[obs.] - h[max.]~~plain('(in.)'))
-width_label <- expression(w[obs.]~~plain('(ft.)'))
+relative_height_label <- expression(italic(h)[obs.] - italic(h)[max.]~~plain('(in.)'))
+width_label <- expression(italic(w)[obs.]~~plain('(ft.)'))
 p_around_label = expression(P(around))
 
 fix_label <- function(label, realign = TRUE) {
@@ -249,7 +249,7 @@ setEPS()
 cairo_ps('critical_heights.eps', width = 9, height = 7)
 showtext.begin()
 ggplot(crit_data, aes(x = double_tan_angle, y = hmax_scaled_crit_height)) +
-  stat_summary(geom = 'bar', fun.y = mean, alpha = 0.75) +
+  stat_summary(geom = 'bar', fun.y = mean, fill = '#000E2F') +
   stat_summary(geom = 'errorbar', size = 1, width = 0.05,
                fun.ymax = . %>% {mean(.) + sem(.)},
                fun.ymin = . %>% {mean(.) - sem(.)}
@@ -258,7 +258,7 @@ ggplot(crit_data, aes(x = double_tan_angle, y = hmax_scaled_crit_height)) +
               linetype = 'dotted', size = 1) +
   annotate(geom = 'text', x = 1.25, y = 0.84, parse = TRUE, family = 'Arial', size = 8,
            label = paste(
-             'frac(hat(h[crit.]), h[max.]) ==', round(intercept, 3), '+', round(slope, 3), '~frac(w[obs.],d[obs.])'
+             'frac(hat(italic(h)[crit.]), italic(h)[max.]) ==', round(intercept, 3), '+', round(slope, 3), '~frac(italic(w)[obs.],italic(d)[obs.])'
            )) +
   scale_x_continuous(breaks = widths / obstacle_distance, name = tan_angle_label) +
   scale_y_continuous(name = scaled_crit_height_label) +
