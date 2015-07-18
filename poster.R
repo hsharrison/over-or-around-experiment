@@ -37,8 +37,8 @@ trial_data <- e
 
 # Trial-data modeling.
 means_mdl <- glmer(action ~ (1|participant), family = binomial(link = 'logit'), trial_data)
-rel_height_mdl <- update(means, . ~ . + relative_height)
-anova(means, rel_height_mdl)
+rel_height_mdl <- update(means_mdl, . ~ . + relative_height)
+anova(means_mdl, rel_height_mdl)
 best_mdl <- rel_height_mdl
 
 widths_mdl <- update(best_mdl, . ~ . + width)
